@@ -22,7 +22,7 @@ def sqlite_data_transfer(tl_sess_path, pyro_sess_path, tl_usr_id):
     test_mode = 0   # всегда 0
     is_bot = 0  # всегда 0
     # tl_date, tl_id = cursor1.execute('SELECT date, id FROM entities').fetchall()[-1]
-    tl_date, tl_id = datetime.datetime.now(), tl_usr_id   # TODO: закоментил получение айдишника и даты, вроде и без этого работало
+    tl_date, tl_id = datetime.datetime.now(), tl_usr_id
 
     # Записываем значение в БД №2
     cursor2.execute('INSERT INTO version (number) VALUES (?)', (tl_version,))

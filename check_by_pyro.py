@@ -2,12 +2,12 @@ import asyncio
 import os
 
 
-async def check_by_pyro():
+async def check_by_pyro(sess_name):
     """
     Фукнция для проверки работоспособности файла сессии pyrogram
     """
     from pyrogram import Client
-    async with Client('new_pyro') as app:
+    async with Client(sess_name) as app:
         getme_rslt = await app.get_me()
         print(getme_rslt)
 

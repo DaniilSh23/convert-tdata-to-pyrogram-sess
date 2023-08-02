@@ -4,13 +4,13 @@ from opentele.td import TDesktop
 from opentele.api import UseCurrentSession
 
 
-async def convert_tdata_to_tl_sess():
+async def convert_tdata_to_tl_sess(tdata_dir_name):
     """
     Функция, которая конвертирует tdata в сесиию telethon
     """
     # Load TDesktop client from tdata folder
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    tdata_folder = os.path.join(current_dir, 'raw_converter/tdata_to_sessions', 'tdata')
+    tdata_folder = os.path.join(current_dir, 'raw_converter', 'tdata_to_sessions', tdata_dir_name, 'tdata')
     tdesk = TDesktop(tdata_folder)
 
     # Check if we have loaded any accounts
@@ -19,7 +19,7 @@ async def convert_tdata_to_tl_sess():
     # flag=UseCurrentSession
     #
     # Convert TDesktop to Telethon using the current session.
-    client = await tdesk.ToTelethon(session="convert_telethon.session", flag=UseCurrentSession)
+    client = await tdesk.ToTelethon(session=f"tl_{tdata_dir_name}.session", flag=UseCurrentSession)
 
     await client.connect()
     await client.PrintSessions()
