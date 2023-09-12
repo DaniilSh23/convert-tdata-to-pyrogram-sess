@@ -1,10 +1,12 @@
 import asyncio
 import datetime
+import json
 import os
 import shutil
 
 from opentele.api import UseCurrentSession
 from opentele.td import TDesktop
+from telethon.errors import UserDeactivatedBanError
 
 
 class SessionConverter:
@@ -29,9 +31,13 @@ class SessionConverter:
         Метод для конвертации tdata в файлы сессий telethon и pyrogram
         """
         for tdata_dir in os.listdir(path=self.source_dir):
+            print(f'Конвертируем аккаунт: {tdata_dir!r}')
             # TODO: прописать метод, который будет распаковывать архив с папкой tdata
             # Конвертируем tdata в сессию telethon
             tl_usr_id = asyncio.run(self.convert_tdata_to_tl_sess(tdata_dir_name=tdata_dir))
+            if not tl_usr_id:
+                print(f'Пропускаем аккаунт: {tdata_dir!r}')
+                continue
 
             # Копируем шаблон файла сессии pyrogram для его наполнения
             tl_session_path = os.path.join(self.current_dir, f'tl_{tdata_dir}.session')
@@ -65,11 +71,20 @@ class SessionConverter:
         # flag=UseCurrentSession
         #
         # Convert TDesktop to Telethon using the current session.
-        client = await tdesk.ToTelethon(session=f"tl_{tdata_dir_name}.session", flag=UseCurrentSession)
+        try:
+            client = await tdesk.ToTelethon(session=f"tl_{tdata_dir_name}.session", flag=UseCurrentSession)
+        except UserDeactivatedBanError as err:
+            print(f'Аккаунт {tdata_dir_name!r} забанен! Текст ошибки: {err}')
+            return None
 
-        await client.connect()
-        await client.PrintSessions()
-        tl_getme_rslt = await client.get_me()
+        try:
+            await client.connect()
+            await client.PrintSessions()
+            tl_getme_rslt = await client.get_me()
+        except UserDeactivatedBanError as err:
+            print(f'Аккаунт {tdata_dir_name!r} забанен! Текст ошибки: {err}')
+            return None
+
         print(f'Результат конвертации в сессию telethon. Метод get_me: {tl_getme_rslt}')
         return tl_getme_rslt.id
 
