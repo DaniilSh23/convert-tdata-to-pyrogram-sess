@@ -29,7 +29,7 @@ def check_by_tl(tl_sess_path, json_path, proxy_path):
     api_id = json_data.get("app_id")
     api_hash = json_data.get("app_hash")
     device_model = json_data.get("device")
-    use_ipv6 = True     # TODO: захардкодил
+    use_ipv6 = False     # TODO: захардкодил
 
     # Открываем файл с проксями
     with open(proxy_path, 'r') as proxy_file:
@@ -50,11 +50,12 @@ def check_by_tl(tl_sess_path, json_path, proxy_path):
     with TelegramClient(
             tl_sess_path,
             app_version=app_version,
+            system_version='4.16.30-vxCUSTOM',
             api_id=api_id,
             api_hash=api_hash,
             device_model=device_model,
-            # proxy=proxy_dct,
-            # use_ipv6=use_ipv6,
+            proxy=proxy_dct,
+            use_ipv6=use_ipv6,
             loop=loop,
             connection_retries=5,
     ) as client:
