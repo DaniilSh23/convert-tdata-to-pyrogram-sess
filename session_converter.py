@@ -49,10 +49,16 @@ class SessionConverter:
 
             # Проверяем работу сессии pyrogram
             check_pyro_sess_rslt = asyncio.run(self.check_by_pyro(sess_name=f'pyro_{tdata_dir}'))
-            if check_pyro_sess_rslt:
+
+            # Если проверка сессии pyrogram была успешной и файлы сессии telethon и pyrogram еще не лежат
+            # в директории с результатами конвертации из TDATA
+            if (check_pyro_sess_rslt
+                    and not os.path.exists(os.path.join(self.dest_dir, "pyrogram_sessions", f"pyro_{tdata_dir}.session"))
+                    and not os.path.exists(os.path.join(self.dest_dir, "telethon_sessions", f"tl_{tdata_dir}.session"))):
                 # Перемещаем файлы сессии в отдельную папку
-                shutil.move(src=pyro_session_path, dst=self.dest_dir)
-                shutil.move(src=tl_session_path, dst=self.dest_dir)
+                shutil.move(src=pyro_session_path, dst=os.path.join(self.dest_dir, "pyrogram_sessions"))
+                shutil.move(src=tl_session_path, dst=os.path.join(self.dest_dir, "telethon_sessions"))
+
             else:
                 # Удаляем созданные файлы сессий
                 os.remove(path=pyro_session_path)
@@ -75,6 +81,7 @@ class SessionConverter:
             client = await tdesk.ToTelethon(session=f"tl_{tdata_dir_name}.session", flag=UseCurrentSession)
         except UserDeactivatedBanError as err:
             print(f'Аккаунт {tdata_dir_name!r} забанен! Текст ошибки: {err}')
+            os.remove(f"tl_{tdata_dir_name}.session")
             return None
 
         try:
@@ -83,6 +90,7 @@ class SessionConverter:
             tl_getme_rslt = await client.get_me()
         except UserDeactivatedBanError as err:
             print(f'Аккаунт {tdata_dir_name!r} забанен! Текст ошибки: {err}')
+            os.remove(f"tl_{tdata_dir_name}.session")
             return None
 
         print(f'Результат конвертации в сессию telethon. Метод get_me: {tl_getme_rslt}')

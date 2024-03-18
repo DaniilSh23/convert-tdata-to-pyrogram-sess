@@ -35,8 +35,8 @@ async def check_by_pyro(sess_name, json_path, proxy_path):
             api_hash=api_hash,
             app_version=app_version,
             device_model=device_model,
-            ipv6=use_ipv6,
-            proxy=proxy,
+            # ipv6=use_ipv6,
+            # proxy=proxy,
     ) as app:
         getme_rslt = await app.get_me()
         print(getme_rslt)

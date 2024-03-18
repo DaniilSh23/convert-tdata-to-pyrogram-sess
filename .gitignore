@@ -1,0 +1,9 @@
+*.txt
+*.session
+raw_converter/tdata_to_sessions/
+*/__pycache__/*
+__pycache__/
+trash/
+proxy_list
+raw_converter/tl_to_pyro/
+/myvenv/

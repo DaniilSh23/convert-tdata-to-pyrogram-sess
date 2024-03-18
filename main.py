@@ -1,5 +1,6 @@
 import asyncio
 import os
+from pathlib import Path
 import shutil
 
 from check_by_pyro import check_by_pyro
@@ -7,6 +8,9 @@ from chek_by_telethon import check_by_tl
 from lib_example import convert_tdata_to_tl_sess
 from session_converter import SessionConverter
 from sqlite_work import sqlite_data_transfer
+
+
+BASE_DIR = Path(__name__).resolve().parent
 
 
 def tl_to_pyro_converter():
@@ -83,14 +87,32 @@ def main():
             shutil.move(src=tl_session_path, dst=os.path.join(current_dir, 'raw_converter', 'res_sessions'))
 
 
-if __name__ == '__main__':
+def make_result_sessions_dirs(result_sessions_parent_dir):
+    """
+    Функция создания директорий для хранения файлов сессий, полученных в результате конвертации из TDATA
+    """
+    # Проверка и создание, при необходимости, директории для хранения файлов сессий pyrogram
+    pyro_sessions_result_path = os.path.join(result_sessions_parent_dir, "pyrogram_sessions")
+    if not os.path.exists(pyro_sessions_result_path):
+        os.mkdir(pyro_sessions_result_path)
 
+    # Проверка и создание, при необходимости, директории для хранения файлов сессий telethon
+    telethon_sessions_result_path = os.path.join(result_sessions_parent_dir, "telethon_sessions")
+    if not os.path.exists(telethon_sessions_result_path):
+        os.mkdir(telethon_sessions_result_path)
+
+
+if __name__ == '__main__':
     # TODO: Закоментил класс, который конвертит из тдата, ниже функция мэйн, в ней выбор из тдата в телетон и
     #  пайрограмм или из телетона в пайрограм, но лучше всё упаковать в класс
-    session_converter = SessionConverter(
-        source_dir='/home/da/PycharmProjects/convert_tdata_to_pyro_sess/raw_converter/tdata_to_sessions',
-        dest_dir='/home/da/PycharmProjects/convert_tdata_to_pyro_sess/raw_converter/sessions_to_tdata'
-    )
+
+    source_dir = os.path.join(BASE_DIR, "raw_converter", "tdata_to_sessions")
+    dest_dir = os.path.join(BASE_DIR, "raw_converter", "res_sessions")
+    session_converter = SessionConverter(source_dir=source_dir, dest_dir=dest_dir)
+
+    # Создаем папок для хранения результатов конвертации, если их еще нет
+    make_result_sessions_dirs(result_sessions_parent_dir=dest_dir)
+
     session_converter.convert_tdata_to_pyro_and_tl()
     # main()
 
